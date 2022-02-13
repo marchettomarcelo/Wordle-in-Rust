@@ -1,21 +1,40 @@
+use colored::*;
 use std::io;
 
-fn replace_nth_char(s: &str, idx: usize, newchar: char) -> String {
-    s.chars()
+fn replace_nth_char(s: &mut String, idx: usize, newchar: char) {
+    *s = s
+        .chars()
         .enumerate()
         .map(|(i, c)| if i == idx { newchar } else { c })
         .collect()
 }
 
+fn update_word_status(guess: &str, secreta: &str, word_status: &mut String) {
+    for (letra_index, letra) in guess.trim().chars().enumerate() {
+        if letra == secreta.chars().nth(letra_index).unwrap() {
+            replace_nth_char(word_status, letra_index, letra);
+        } else if secreta.contains(letra) {
+            replace_nth_char(word_status, letra_index, '*');
+        } else {
+            replace_nth_char(word_status, letra_index, '_')
+        }
+    }
+}
+
 fn game() {
     let mut word_status = String::from("______");
-    let secreta = String::from("insper");
-    println!("Acete a palavra secreta!:");
+    let secreta = "insper";
+
+    println!(" ");
+    println!("{}", "Acete a palavra secreta!:".blue().bold());
 
     for _ in 0..6 {
         // println!("---------------------------------------------------------------------------");
-        println!("Status da palavra: {}", word_status);
-        println!("---------------------------------------------------------------------------");
+        println!("{} {}", "Status da palavra:".yellow(), word_status.red());
+        println!(
+            "{}",
+            "---------------------------------------------------------------------------"
+        );
 
         let mut guess = String::new();
 
@@ -23,29 +42,44 @@ fn game() {
             .read_line(&mut guess)
             .expect("Failed to read line");
 
-        match guess.trim().len() {
+        let guess = guess.trim();
+
+        match guess.len() {
             6 => (),
             _ => {
-                println!("PALAVRA COM O NUMERO ERRADO DE CARACTERES!!!!!!");
+                println!(
+                    "{}",
+                    "PALAVRA COM O NUMERO ERRADO DE CARACTERES!!!!!!".red()
+                );
                 continue;
             }
         };
 
-        for (letra_index, letra) in guess.trim().chars().enumerate() {
-            if letra == secreta.chars().nth(letra_index).unwrap() {
-                word_status = replace_nth_char(&word_status, letra_index, letra);
-            }
-            // println!("{}", secreta.chars().nth(0).unwrap())
-        }
+        update_word_status(&guess, secreta, &mut word_status);
 
-        if guess.trim() == secreta {
-            println!("Acertou miseravi");
+        println!("{}", word_status);
+
+        if guess == secreta {
+            // println!("Acertou miseravi");
             break;
         } else {
-            println!("Nao e a palavra")
         }
     }
-    println!("Voce perdeu o jogo :(")
+
+    if word_status == secreta {
+        println!(
+            "{}",
+            "Voce ganhou o jogo! Parabêns!! :)"
+                .green()
+                .bold()
+                .underline()
+        );
+        println!("");
+        return;
+    } else {
+        println!("Voce perdeu o jogo :(");
+        return;
+    }
 }
 fn main() {
     game()
