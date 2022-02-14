@@ -10,14 +10,22 @@ fn replace_nth_char(s: &mut String, idx: usize, newchar: char) {
 }
 
 fn update_word_status(guess: &str, secreta: &str, word_status: &mut String) {
-    for (letra_index, letra) in guess.trim().chars().enumerate() {
-        if letra == secreta.chars().nth(letra_index).unwrap() {
-            replace_nth_char(word_status, letra_index, letra);
-        } else if secreta.contains(letra) {
-            replace_nth_char(word_status, letra_index, '*');
-        } else {
-            replace_nth_char(word_status, letra_index, '_')
+    for (guess_letra_index, guess_letra) in guess.trim().chars().enumerate() {
+        let secrtea_letra = secreta.chars().nth(guess_letra_index).unwrap();
+
+        if guess_letra == secrtea_letra {
+            replace_nth_char(word_status, guess_letra_index, guess_letra);
+        } else if secreta.contains(guess_letra) {
+            replace_nth_char(word_status, guess_letra_index, '*');
         }
+    }
+}
+
+fn validate_input(user_guess: &mut String) -> Result<(), &'static str> {
+    if user_guess == "opa" {
+        return Err("INPUT INVALIDO");
+    } else {
+        println!("vbom dia")
     }
 }
 
